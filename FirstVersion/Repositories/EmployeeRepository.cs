@@ -7,32 +7,34 @@ namespace FirstVersion.Repositories;
 
 public class EmployeeRepository(AppDbContext appDbContext) : IEmployeeRepository
 {
-    public async Task<List<Employee>?> GetEmployeesByCompanyIdAsync(int companyId)
+    public async Task<List<Employee>?> GetEmployeesWithCompletedDealsByCompanyIdAsync(int companyId)
     {
         var company = await appDbContext
             .Companies.Where(c => c.Id == companyId)
             .Include(c => c.Employees)
-                .ThenInclude(employee => employee.CompletedDeals)
+            .ThenInclude(employee => employee.CompletedDeals)
             .FirstOrDefaultAsync();
         return company?.Employees;
     }
 
-    public async Task UpdateEmployeeAsync(Employee employee)
+    public Task<Employee> UpdateEmployeeAsync(Employee employee)
     {
-        appDbContext.Employees.Update(employee);
-        await appDbContext.SaveChangesAsync();
+        var result = appDbContext.Employees.Update(employee);
+        return Task.FromResult(result.Entity);
     }
 
     public async Task<Company?> GetCompanyByEmployeeIdAsync(int employeeId)
     {
-        var employee = await appDbContext.Employees
-            .Include(e => e.Company)
+        var employee = await appDbContext
+            .Employees.Include(e => e.Company)
             .FirstOrDefaultAsync(employee => employee.Id == employeeId);
         return employee?.Company;
     }
 
-    public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
+    public async Task<Employee?> GetEmployeeWithCompletedDealsByIdAsync(int employeeId)
     {
-        return await appDbContext.Employees.FirstOrDefaultAsync(employee => employee.Id == employeeId);
+        return await appDbContext
+            .Employees.Include(employee => employee.CompletedDeals)
+            .FirstOrDefaultAsync(employee => employee.Id == employeeId);
     }
 }

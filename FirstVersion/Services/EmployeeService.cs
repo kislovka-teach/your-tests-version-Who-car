@@ -3,11 +3,13 @@ using FirstVersion.Models;
 
 namespace FirstVersion.Services;
 
-public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployeeService
+public class EmployeeService(IEmployeeRepository employeeRepository, IUnitOfWork unitOfWork) : IEmployeeService
 {
     public async Task<Dictionary<Employee, decimal>> CalculateSalaryAsync(int companyId)
     {
-        var employees = await employeeRepository.GetEmployeesByCompanyIdAsync(companyId);
+        var employees = await employeeRepository.GetEmployeesWithCompletedDealsByCompanyIdAsync(
+            companyId
+        );
         if (employees is null)
             throw new Exception($"No company with id {companyId}");
 
@@ -19,6 +21,8 @@ public class EmployeeService(IEmployeeRepository employeeRepository) : IEmployee
             await employeeRepository.UpdateEmployeeAsync(employee);
             result.Add(employee, salary);
         }
+
+        await unitOfWork.SaveChangesAsync();
 
         return result;
     }

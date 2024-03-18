@@ -7,7 +7,7 @@ namespace SecondVersion.Repositories;
 
 public class CompanyRepository(AppDbContext appDbContext) : ICompanyRepository
 {
-    public async Task<List<Teacher>?> GetTeachersByCompanyIdAsync(int companyId)
+    public async Task<List<Teacher>?> GetTeachersWithCoursesPublishedByCompanyIdAsync(int companyId)
     {
         var company = await appDbContext
             .Companies.Where(c => c.Id == companyId)
@@ -25,9 +25,9 @@ public class CompanyRepository(AppDbContext appDbContext) : ICompanyRepository
         return teacher?.Company;
     }
 
-    public async Task UpdateTeacherAsync(Teacher teacher)
+    public Task<Teacher> UpdateTeacherAsync(Teacher teacher)
     {
-        appDbContext.Teachers.Update(teacher);
-        await appDbContext.SaveChangesAsync();
+        var result = appDbContext.Teachers.Update(teacher);
+        return Task.FromResult(result.Entity);
     }
 }

@@ -7,10 +7,10 @@ namespace SecondVersion.Repositories;
 
 public class CourseRepository(AppDbContext appDbContext) : ICourseRepository
 {
-    public async Task AddNewCourseAsync(Course course)
+    public async Task<Course> AddNewCourseAsync(Course course)
     {
-        await appDbContext.Courses.AddAsync(course);
-        await appDbContext.SaveChangesAsync();
+        var result = await appDbContext.Courses.AddAsync(course);
+        return result.Entity;
     }
 
     public async Task<List<Course>?> GetAllCoursesAsync(Func<Course, bool>? predicate = null)
@@ -20,23 +20,24 @@ public class CourseRepository(AppDbContext appDbContext) : ICourseRepository
         return appDbContext.Courses.Where(predicate).ToList();
     }
 
-    public async Task<Course?> GetCourseByIdAsync(int courseId)
+    public async Task<Course?> GetCourseWithModulesByIdAsync(int courseId)
     {
-        return await appDbContext.Courses.FirstOrDefaultAsync(course => course.Id == courseId);
+        return await appDbContext
+            .Courses.Include(course => course.Modules)
+            .FirstOrDefaultAsync(course => course.Id == courseId);
     }
 
-    public async Task UpdateCourseAsync(Course course)
+    public Task<Course> UpdateCourseAsync(Course course)
     {
-        appDbContext.Courses.Update(course);
-        await appDbContext.SaveChangesAsync();
+        var result = appDbContext.Courses.Update(course);
+        return Task.FromResult(result.Entity);
     }
 
     public async Task InsertModuleAsync(Module module, int courseId, int index)
     {
-       var course = await appDbContext.Courses.FirstOrDefaultAsync(course => course.Id == courseId);
-       if (course is null)
-           return; 
-       course.Modules.Insert(index, module);
-       await appDbContext.SaveChangesAsync();
+        var course = await appDbContext.Courses.Include(c => c.Modules).SingleAsync(
+            course => course.Id == courseId
+        );
+        course.Modules.Insert(index, module);
     }
 }

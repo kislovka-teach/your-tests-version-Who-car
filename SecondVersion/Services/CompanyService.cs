@@ -3,11 +3,11 @@ using SecondVersion.Entities;
 
 namespace SecondVersion.Services;
 
-public class CompanyService(ICompanyRepository companyRepository) : ICompanyService
+public class CompanyService(ICompanyRepository companyRepository, IUnitOfWork unitOfWork) : ICompanyService
 {
     public async Task<Dictionary<Teacher, decimal>> CalculateSalaryAsync(int companyId)
     {
-        var teachers = await companyRepository.GetTeachersByCompanyIdAsync(companyId);
+        var teachers = await companyRepository.GetTeachersWithCoursesPublishedByCompanyIdAsync(companyId);
         if (teachers is null)
             throw new Exception($"No company with id {companyId}");
 
@@ -27,6 +27,8 @@ public class CompanyService(ICompanyRepository companyRepository) : ICompanyServ
             await companyRepository.UpdateTeacherAsync(teacher);
             result.Add(teacher, salary);
         }
+
+        await unitOfWork.SaveChangesAsync();
 
         return result;
     }

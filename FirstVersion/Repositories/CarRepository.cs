@@ -7,10 +7,10 @@ namespace FirstVersion.Repositories;
 
 public class CarRepository(AppDbContext appDbContext) : ICarRepository
 {
-    public async Task AddNewCarAsync(Car car)
+    public async Task<Car> AddNewCarAsync(Car car)
     {
-        await appDbContext.Cars.AddAsync(car);
-        await appDbContext.SaveChangesAsync();
+        var result = await appDbContext.Cars.AddAsync(car);
+        return result.Entity;
     }
 
     public async Task<List<Car>?> GetAllCarsAsync(Func<Car, bool>? predicate = null)
@@ -25,9 +25,9 @@ public class CarRepository(AppDbContext appDbContext) : ICarRepository
         return await appDbContext.Cars.FirstOrDefaultAsync(car => car.Id == carId);
     }
 
-    public async Task UpdateCarAsync(Car car)
+    public Task<Car> UpdateCarAsync(Car car)
     {
-        appDbContext.Cars.Update(car);
-        await appDbContext.SaveChangesAsync();
+        var result = appDbContext.Cars.Update(car);
+        return Task.FromResult(result.Entity);
     }
 }

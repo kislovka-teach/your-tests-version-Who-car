@@ -27,6 +27,7 @@ builder
     });
 
 builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<ICarRepository, CarRepository>();

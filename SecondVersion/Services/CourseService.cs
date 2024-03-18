@@ -4,7 +4,12 @@ using SecondVersion.Models;
 
 namespace SecondVersion.Services;
 
-public class CourseService(ICourseRepository courseRepository, IModuleRepository moduleRepository, IStudentRepository studentRepository) : ICourseService
+public class CourseService(
+    ICourseRepository courseRepository,
+    IModuleRepository moduleRepository,
+    IStudentRepository studentRepository,
+    IUnitOfWork unitOfWork
+) : ICourseService
 {
     public async Task AddNewCourseAsync(AddCourseRequest courseRequest, int teacherId)
     {
@@ -20,6 +25,7 @@ public class CourseService(ICourseRepository courseRepository, IModuleRepository
             course.Modules = courseRequest.Modules;
 
         await courseRepository.AddNewCourseAsync(course);
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task AddNewModuleAsync(AddModuleRequest moduleRequest)
@@ -30,12 +36,17 @@ public class CourseService(ICourseRepository courseRepository, IModuleRepository
             ContentUrl = moduleRequest.ContentUrl,
             CourseId = moduleRequest.CourseId
         };
-        
+
         if (moduleRequest.Ordinal == -1)
             await moduleRepository.AddNewModuleAsync(module);
 
         module.Ordinal = moduleRequest.Ordinal;
-        await courseRepository.InsertModuleAsync(module, moduleRequest.CourseId, moduleRequest.Ordinal);
+        await courseRepository.InsertModuleAsync(
+            module,
+            moduleRequest.CourseId,
+            moduleRequest.Ordinal
+        );
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task<List<Course>?> GetAllCoursesAsync(string? theme = null, double? rating = null)
@@ -45,7 +56,9 @@ public class CourseService(ICourseRepository courseRepository, IModuleRepository
         else if (rating is null)
             return await courseRepository.GetAllCoursesAsync(course => course.Theme == theme);
         else
-            return await courseRepository.GetAllCoursesAsync(course => course.Theme == theme && course.Rating >= rating);
+            return await courseRepository.GetAllCoursesAsync(
+                course => course.Theme == theme && course.Rating >= rating
+            );
     }
 
     public async Task<GetModuleContentResponse?> GetModuleAsync(int moduleId)
@@ -58,27 +71,30 @@ public class CourseService(ICourseRepository courseRepository, IModuleRepository
 
     public async Task EnrollCourseAsync(int courseId, int studentId)
     {
-        var course = await courseRepository.GetCourseByIdAsync(courseId);
+        var course = await courseRepository.GetCourseWithModulesByIdAsync(courseId);
         if (course is null)
             throw new Exception($"No registered course with id {courseId}");
-        
-        var student = await studentRepository.GetStudentByIdAsync(studentId);
+
+        var student = await studentRepository.GetStudentWithCoursesEnrolledByIdAsync(studentId);
         if (student is null)
             throw new Exception($"No registered student with id {studentId}");
-        
+
         course.StudentsEnrolled.Add(student);
         await courseRepository.UpdateCourseAsync(course);
         student.CoursesEnrolled.Add(course);
         await studentRepository.UpdateStudentAsync(student);
+
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task VoteAsync(int courseId, short score)
     {
-        var course = await courseRepository.GetCourseByIdAsync(courseId);
+        var course = await courseRepository.GetCourseWithModulesByIdAsync(courseId);
         if (course is null)
             throw new Exception($"No registered course with id {courseId}");
 
         course.Rating = (course.Rating + score) / course.StudentsEnrolled.Count;
         await courseRepository.UpdateCourseAsync(course);
+        await unitOfWork.SaveChangesAsync();
     }
 }

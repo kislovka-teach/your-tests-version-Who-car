@@ -7,17 +7,10 @@ namespace SecondVersion.Repositories;
 
 public class ModuleRepository(AppDbContext appDbContext) : IModuleRepository
 {
-    public async Task AddNewModuleAsync(Module module)
+    public async Task<Module> AddNewModuleAsync(Module module)
     {
-        await appDbContext.Modules.AddAsync(module);
-        await appDbContext.SaveChangesAsync();
-    }
-
-    public async Task<List<Module>?> GetAllModulesAsync(Func<Module, bool>? predicate = null)
-    {
-        if (predicate is null)
-            return await appDbContext.Modules.ToListAsync();
-        return appDbContext.Modules.Where(predicate).ToList();
+        var result = await appDbContext.Modules.AddAsync(module);
+        return result.Entity;
     }
 
     public async Task<Module?> GetModuleByIdAsync(int moduleId)

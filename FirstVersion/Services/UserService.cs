@@ -30,7 +30,6 @@ public class UserService(
         {
             new("ID", user.Id.ToString()),
             new(ClaimTypes.Name, user.Name),
-            new("Surname", user.Surname),
             new(ClaimTypes.Role, user.Role.ToString())
         };
         if (user.Role == Role.Employee)

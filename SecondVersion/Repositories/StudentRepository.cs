@@ -7,14 +7,16 @@ namespace SecondVersion.Repositories;
 
 public class StudentRepository(AppDbContext appDbContext) : IStudentRepository
 {
-    public async Task<Student?> GetStudentByIdAsync(int studentId)
+    public async Task<Student?> GetStudentWithCoursesEnrolledByIdAsync(int studentId)
     {
-        return await appDbContext.Students.FirstOrDefaultAsync(student => student.Id == studentId);
+        return await appDbContext
+            .Students.Include(student => student.CoursesEnrolled)
+            .FirstOrDefaultAsync(student => student.Id == studentId);
     }
 
-    public async Task UpdateStudentAsync(Student student)
+    public Task<Student> UpdateStudentAsync(Student student)
     {
-        appDbContext.Students.Update(student);
-        await appDbContext.SaveChangesAsync();
+        var result = appDbContext.Students.Update(student);
+        return Task.FromResult(result.Entity);
     }
 }
