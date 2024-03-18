@@ -1,4 +1,5 @@
-﻿using FirstVersion.Models;
+﻿using FirstVersion.Entities;
+using FirstVersion.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,6 +22,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .Property(user => user.Role)
             .IsRequired()
-            .HasDefaultValue(Role.Driver);
+            .HasDefaultValue(Roles.Driver);
     }
 }

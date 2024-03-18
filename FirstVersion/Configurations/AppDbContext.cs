@@ -1,4 +1,5 @@
 ﻿using FirstVersion.Configurations.ModelConfigurations;
+using FirstVersion.Entities;
 using FirstVersion.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -50,21 +51,21 @@ public class AppDbContext : DbContext
                 Id = 1,
                 Login = "123",
                 Password = "123",
-                Role = Role.Driver
+                Role = Roles.Driver
             },
             new Driver
             {
                 Id = 2,
                 Login = "1234",
                 Password = "1234",
-                Role = Role.Driver
+                Role = Roles.Driver
             },
             new Driver
             {
                 Id = 3,
                 Login = "12345",
                 Password = "12345",
-                Role = Role.Driver
+                Role = Roles.Driver
             }
         };
 
@@ -75,7 +76,7 @@ public class AppDbContext : DbContext
                 Id = 4,
                 Login = "123456",
                 Password = "123456",
-                Role = Role.Employee,
+                Role = Roles.Employee,
                 CompanyId = 1
             },
             new Employee
@@ -83,7 +84,7 @@ public class AppDbContext : DbContext
                 Id = 5,
                 Login = "1234567",
                 Password = "1234567",
-                Role = Role.Employee,
+                Role = Roles.Employee,
                 CompanyId = 2
             }
         };

@@ -26,7 +26,7 @@ public class UserService(IUserRepository userRepository, ICompanyRepository comp
             new("ID", user.Id.ToString()),
             new(ClaimTypes.Role, user.Role.ToString())
         };
-        if (user.Role == Role.Teacher)
+        if (user.Role == Roles.Teacher)
         {
             var company = await companyRepository.GetCompanyByTeacherIdAsync(user.Id);
             claims.Add(new Claim("Company ID", company.Id.ToString()));

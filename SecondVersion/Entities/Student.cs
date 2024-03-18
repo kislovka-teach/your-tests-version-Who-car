@@ -7,6 +7,6 @@ public class Student : User
 
     public Student()
     {
-        Role = Role.Student;
+        Role = Roles.Student;
     }
 }

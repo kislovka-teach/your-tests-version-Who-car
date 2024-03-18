@@ -1,7 +1,7 @@
-﻿namespace FirstVersion.Models;
+﻿namespace FirstVersion.Entities;
 
-public enum Role
+public class Roles
 {
-    Driver,
-    Employee
+    public const string Driver = "driver";
+    public const string Employee = "employee";
 }

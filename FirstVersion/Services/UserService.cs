@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using FirstVersion.Abstractions;
+using FirstVersion.Entities;
 using FirstVersion.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -30,9 +31,9 @@ public class UserService(
         {
             new("ID", user.Id.ToString()),
             new(ClaimTypes.Name, user.Name),
-            new(ClaimTypes.Role, user.Role.ToString())
+            new(ClaimTypes.Role, user.Role)
         };
-        if (user.Role == Role.Employee)
+        if (user.Role == Roles.Employee)
         {
             var company = await employeeRepository.GetCompanyByEmployeeIdAsync(user.Id);
             claims.Add(new Claim("Company", company.Name));

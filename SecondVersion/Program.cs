@@ -23,7 +23,7 @@ builder.Services.AddAuthorization(options =>
         "TeachersOnly",
         policyBuilder =>
         {
-            policyBuilder.RequireClaim(ClaimTypes.Role, Role.Teacher.ToString());
+            policyBuilder.RequireClaim(ClaimTypes.Role, Roles.Teacher);
         }
     );
 });

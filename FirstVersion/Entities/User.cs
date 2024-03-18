@@ -1,4 +1,6 @@
-﻿namespace FirstVersion.Models;
+﻿using FirstVersion.Entities;
+
+namespace FirstVersion.Models;
 
 public class User
 {
@@ -7,5 +9,5 @@ public class User
     public string Surname { get; set; }
     public string Login { get; set; }
     public string Password { get; set; }
-    public Role Role { get; set; }
+    public string Role { get; set; }
 }

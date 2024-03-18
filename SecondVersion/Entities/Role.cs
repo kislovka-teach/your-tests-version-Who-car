@@ -1,7 +1,7 @@
 ﻿namespace SecondVersion.Entities;
 
-public enum Role
+public class Roles
 {
-    Student,
-    Teacher
+    public const string Student = "student";
+    public const string Teacher = "teacher";
 }
